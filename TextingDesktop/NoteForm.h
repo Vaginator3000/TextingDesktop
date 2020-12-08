@@ -34,11 +34,15 @@ namespace TextingDesktop {
 			text = _text;
 			title = _title;
 		}
-		String^ title;
-		String^ date;
+		String^ title = "";
+		String^ date = "";
+		String^ text = "";
 	private: System::Windows::Forms::CheckBox^ Date_CheckBox;
+	private: System::Windows::Forms::Button^ Save_btn;
+	private: System::Windows::Forms::Button^ Bold_btn;
+	private: System::Windows::Forms::Button^ Undline_btn;
+	private: System::Windows::Forms::Button^ Italic_btn;
 	public:
-		String^ text;
 
 	protected:
 		/// <summary>
@@ -83,6 +87,10 @@ namespace TextingDesktop {
 			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->Text_rtb = (gcnew System::Windows::Forms::RichTextBox());
 			this->Date_CheckBox = (gcnew System::Windows::Forms::CheckBox());
+			this->Save_btn = (gcnew System::Windows::Forms::Button());
+			this->Bold_btn = (gcnew System::Windows::Forms::Button());
+			this->Undline_btn = (gcnew System::Windows::Forms::Button());
+			this->Italic_btn = (gcnew System::Windows::Forms::Button());
 			this->SuspendLayout();
 			// 
 			// Title_tb
@@ -121,7 +129,7 @@ namespace TextingDesktop {
 			this->DatePicker->Enabled = false;
 			this->DatePicker->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(204)));
-			this->DatePicker->Format = System::Windows::Forms::DateTimePickerFormat::Custom;
+			this->DatePicker->Format = System::Windows::Forms::DateTimePickerFormat::Short;
 			this->DatePicker->Location = System::Drawing::Point(16, 95);
 			this->DatePicker->Name = L"DatePicker";
 			this->DatePicker->Size = System::Drawing::Size(236, 26);
@@ -142,7 +150,7 @@ namespace TextingDesktop {
 			// 
 			this->Text_rtb->Location = System::Drawing::Point(16, 160);
 			this->Text_rtb->Name = L"Text_rtb";
-			this->Text_rtb->Size = System::Drawing::Size(236, 309);
+			this->Text_rtb->Size = System::Drawing::Size(236, 287);
 			this->Text_rtb->TabIndex = 7;
 			this->Text_rtb->Text = L"";
 			// 
@@ -156,11 +164,54 @@ namespace TextingDesktop {
 			this->Date_CheckBox->UseVisualStyleBackColor = true;
 			this->Date_CheckBox->CheckedChanged += gcnew System::EventHandler(this, &NoteForm::Date_CheckBox_CheckedChanged);
 			// 
+			// Save_btn
+			// 
+			this->Save_btn->Location = System::Drawing::Point(177, 453);
+			this->Save_btn->Name = L"Save_btn";
+			this->Save_btn->Size = System::Drawing::Size(75, 23);
+			this->Save_btn->TabIndex = 9;
+			this->Save_btn->Text = L"Сохранить";
+			this->Save_btn->UseVisualStyleBackColor = true;
+			// 
+			// Bold_btn
+			// 
+			this->Bold_btn->Location = System::Drawing::Point(16, 453);
+			this->Bold_btn->Name = L"Bold_btn";
+			this->Bold_btn->Size = System::Drawing::Size(23, 23);
+			this->Bold_btn->TabIndex = 10;
+			this->Bold_btn->Text = L"B";
+			this->Bold_btn->UseVisualStyleBackColor = true;
+			this->Bold_btn->Click += gcnew System::EventHandler(this, &NoteForm::Bold_btn_Click);
+			// 
+			// Undline_btn
+			// 
+			this->Undline_btn->Location = System::Drawing::Point(45, 453);
+			this->Undline_btn->Name = L"Undline_btn";
+			this->Undline_btn->Size = System::Drawing::Size(23, 23);
+			this->Undline_btn->TabIndex = 11;
+			this->Undline_btn->Text = L"U";
+			this->Undline_btn->UseVisualStyleBackColor = true;
+			this->Undline_btn->Click += gcnew System::EventHandler(this, &NoteForm::Undline_btn_Click);
+			// 
+			// Italic_btn
+			// 
+			this->Italic_btn->Location = System::Drawing::Point(74, 453);
+			this->Italic_btn->Name = L"Italic_btn";
+			this->Italic_btn->Size = System::Drawing::Size(23, 23);
+			this->Italic_btn->TabIndex = 12;
+			this->Italic_btn->Text = L"I";
+			this->Italic_btn->UseVisualStyleBackColor = true;
+			this->Italic_btn->Click += gcnew System::EventHandler(this, &NoteForm::Italic_btn_Click);
+			// 
 			// NoteForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(264, 481);
+			this->Controls->Add(this->Italic_btn);
+			this->Controls->Add(this->Undline_btn);
+			this->Controls->Add(this->Bold_btn);
+			this->Controls->Add(this->Save_btn);
 			this->Controls->Add(this->Date_CheckBox);
 			this->Controls->Add(this->Text_rtb);
 			this->Controls->Add(this->label3);
@@ -178,6 +229,32 @@ namespace TextingDesktop {
 
 		}
 #pragma endregion
+	//Жирный текст
+	private: System::Void Bold_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
+		System::Drawing::FontStyle italic = selected->Italic ? System::Drawing::FontStyle::Italic : System::Drawing::FontStyle::Regular;
+		System::Drawing::FontStyle underlined = selected->Underline ? System::Drawing::FontStyle::Underline : System::Drawing::FontStyle::Regular;
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Bold ? System::Drawing::FontStyle::Regular | italic | underlined : System::Drawing::FontStyle::Bold | italic | underlined);
+		Text_rtb->SelectionFont = selected;
+	}
+
+	//Подчеркнутый текст
+	private: System::Void Undline_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
+		System::Drawing::FontStyle bold = selected->Bold ? System::Drawing::FontStyle::Bold : System::Drawing::FontStyle::Regular;
+		System::Drawing::FontStyle italic = selected->Italic ? System::Drawing::FontStyle::Italic : System::Drawing::FontStyle::Regular;
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Underline ? System::Drawing::FontStyle::Regular | italic | bold : System::Drawing::FontStyle::Underline | italic | bold);
+		Text_rtb->SelectionFont = selected;
+	}
+
+	//Курсив
+	private: System::Void Italic_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
+		System::Drawing::FontStyle bold = selected->Bold ? System::Drawing::FontStyle::Bold : System::Drawing::FontStyle::Regular;
+		System::Drawing::FontStyle underlined = selected->Underline ? System::Drawing::FontStyle::Underline : System::Drawing::FontStyle::Regular;
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Italic ? System::Drawing::FontStyle::Regular | bold | underlined : System::Drawing::FontStyle::Italic | bold | underlined);
+		Text_rtb->SelectionFont = selected;
+	}
 	private: System::Void Date_CheckBox_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 		if (Date_CheckBox->Checked) 
 			DatePicker->Enabled = true;
@@ -187,13 +264,13 @@ namespace TextingDesktop {
 
 	private: System::Void NoteForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		if (title != "") Title_tb->Text = title;
-		MessageBox::Show(title);
 		MessageBox::Show(date);
-		MessageBox::Show(text);
 		if (date != "") {
-			Date_CheckBox->Checked = true;
+			Date_CheckBox->Checked = true; 
+			MessageBox::Show(date);
 			DatePicker->Value = Convert::ToDateTime(date);
 		}
+	//	else DatePicker->Value = Convert::ToDateTime(date);
 		if (text != "") Text_rtb->Text = text;
 	}
 };

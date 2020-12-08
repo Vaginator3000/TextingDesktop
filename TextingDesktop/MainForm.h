@@ -322,7 +322,6 @@ namespace TextingDesktop {
 
 	private: System::Void listView1_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		if (listView1->SelectedItems->Count == 1) {
-			//	MessageBox::Show(listView1->SelectedItems[0]->Index.ToString());
 			String^ title = notes[listView1->SelectedItems[0]->Index]->getTitle();
 			String^ date = notes[listView1->SelectedItems[0]->Index]->getDate();
 			String^ text = notes[listView1->SelectedItems[0]->Index]->getText();
