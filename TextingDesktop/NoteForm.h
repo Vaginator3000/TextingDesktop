@@ -1,4 +1,5 @@
 #pragma once
+#include "Note_Item.cpp"
 
 namespace TextingDesktop {
 
@@ -23,17 +24,27 @@ namespace TextingDesktop {
 			//
 		}
 
+		NoteForm(Note_Item^ _new_note)
+		{
+			InitializeComponent();
+			new_note = _new_note;
+		}
 
-		NoteForm(String^ _title, String^ _date, String^ _text)
+
+		NoteForm(String^ _id, String^ _title, String^ _date, String^ _text, Note_Item^ _new_note)
 		{
 			InitializeComponent();
 			//
 			//TODO: добавьте код конструктора
 			//
+			id = _id;
 			date = _date;
 			text = _text;
 			title = _title;
+			new_note = _new_note;
 		}
+		Note_Item^ new_note = gcnew Note_Item();
+		String^ id = "";
 		String^ title = "";
 		String^ date = "";
 		String^ text = "";
@@ -172,6 +183,7 @@ namespace TextingDesktop {
 			this->Save_btn->TabIndex = 9;
 			this->Save_btn->Text = L"Сохранить";
 			this->Save_btn->UseVisualStyleBackColor = true;
+			this->Save_btn->Click += gcnew System::EventHandler(this, &NoteForm::Save_btn_Click);
 			// 
 			// Bold_btn
 			// 
@@ -222,6 +234,7 @@ namespace TextingDesktop {
 			this->MaximizeBox = false;
 			this->MaximumSize = System::Drawing::Size(280, 520);
 			this->Name = L"NoteForm";
+			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
 			this->Text = L"NoteForm";
 			this->Load += gcnew System::EventHandler(this, &NoteForm::NoteForm_Load);
 			this->ResumeLayout(false);
@@ -234,7 +247,8 @@ namespace TextingDesktop {
 		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
 		System::Drawing::FontStyle italic = selected->Italic ? System::Drawing::FontStyle::Italic : System::Drawing::FontStyle::Regular;
 		System::Drawing::FontStyle underlined = selected->Underline ? System::Drawing::FontStyle::Underline : System::Drawing::FontStyle::Regular;
-		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Bold ? System::Drawing::FontStyle::Regular | italic | underlined : System::Drawing::FontStyle::Bold | italic | underlined);
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, 
+			(selected->Bold ? System::Drawing::FontStyle::Regular : System::Drawing::FontStyle::Bold) | italic | underlined);
 		Text_rtb->SelectionFont = selected;
 	}
 
@@ -243,7 +257,8 @@ namespace TextingDesktop {
 		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
 		System::Drawing::FontStyle bold = selected->Bold ? System::Drawing::FontStyle::Bold : System::Drawing::FontStyle::Regular;
 		System::Drawing::FontStyle italic = selected->Italic ? System::Drawing::FontStyle::Italic : System::Drawing::FontStyle::Regular;
-		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Underline ? System::Drawing::FontStyle::Regular | italic | bold : System::Drawing::FontStyle::Underline | italic | bold);
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, 
+			(selected->Underline ? System::Drawing::FontStyle::Regular : System::Drawing::FontStyle::Underline) | italic | bold);
 		Text_rtb->SelectionFont = selected;
 	}
 
@@ -252,9 +267,11 @@ namespace TextingDesktop {
 		System::Drawing::Font^ selected = Text_rtb->SelectionFont;
 		System::Drawing::FontStyle bold = selected->Bold ? System::Drawing::FontStyle::Bold : System::Drawing::FontStyle::Regular;
 		System::Drawing::FontStyle underlined = selected->Underline ? System::Drawing::FontStyle::Underline : System::Drawing::FontStyle::Regular;
-		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, selected->Italic ? System::Drawing::FontStyle::Regular | bold | underlined : System::Drawing::FontStyle::Italic | bold | underlined);
+		selected = gcnew System::Drawing::Font(selected->FontFamily, selected->Size, 
+			(selected->Italic ? System::Drawing::FontStyle::Regular : System::Drawing::FontStyle::Italic) | bold | underlined);
 		Text_rtb->SelectionFont = selected;
 	}
+
 	private: System::Void Date_CheckBox_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
 		if (Date_CheckBox->Checked) 
 			DatePicker->Enabled = true;
@@ -264,14 +281,21 @@ namespace TextingDesktop {
 
 	private: System::Void NoteForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		if (title != "") Title_tb->Text = title;
-		MessageBox::Show(date);
+	//	MessageBox::Show(date);
 		if (date != "") {
 			Date_CheckBox->Checked = true; 
-			MessageBox::Show(date);
 			DatePicker->Value = Convert::ToDateTime(date);
 		}
 	//	else DatePicker->Value = Convert::ToDateTime(date);
-		if (text != "") Text_rtb->Text = text;
+		if (text != "") Text_rtb->Rtf = text;
+	}
+
+	private: System::Void Save_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (Date_CheckBox->Checked) 
+			new_note->setNoteItems(id, Title_tb->Text, DatePicker->Value.ToShortDateString(), Text_rtb->Rtf);
+		else 
+			new_note->setNoteItems(id, Title_tb->Text, "", Text_rtb->Rtf);
+		this->Close();
 	}
 };
 }

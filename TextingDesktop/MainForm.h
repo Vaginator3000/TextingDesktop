@@ -21,12 +21,10 @@ namespace TextingDesktop {
 	public ref class MainForm : public System::Windows::Forms::Form
 	{
 	public: array<Note_Item^>^ notes; //массив заметок
-
-
-	public:
-
-	public:
 	public: int NOTES_COUNT = 0; //количество заметок
+	public: Note_Item^ new_note = gcnew Note_Item(); //новосозданная заметка
+
+	public:
 	public:
 		MainForm(void)
 		{
@@ -73,7 +71,6 @@ namespace TextingDesktop {
 		/// </summary>
 		   void InitializeComponent(void)
 		   {
-			   System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			   this->listView1 = (gcnew System::Windows::Forms::ListView());
 			   this->column_name = (gcnew System::Windows::Forms::ColumnHeader());
 			   this->column_date = (gcnew System::Windows::Forms::ColumnHeader());
@@ -100,7 +97,6 @@ namespace TextingDesktop {
 			   this->listView1->View = System::Windows::Forms::View::Details;
 			   this->listView1->ColumnWidthChanged += gcnew System::Windows::Forms::ColumnWidthChangedEventHandler(this, &MainForm::listView1_ColumnWidthChanged);
 			   this->listView1->ItemMouseHover += gcnew System::Windows::Forms::ListViewItemMouseHoverEventHandler(this, &MainForm::listView1_ItemMouseHover);
-			   this->listView1->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::listView1_MouseClick);
 			   this->listView1->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::listView1_MouseDoubleClick);
 			   // 
 			   // column_name
@@ -134,13 +130,13 @@ namespace TextingDesktop {
 			   this->загрузитьToolStripMenuItem->Name = L"загрузитьToolStripMenuItem";
 			   this->загрузитьToolStripMenuItem->Size = System::Drawing::Size(128, 22);
 			   this->загрузитьToolStripMenuItem->Text = L"Загрузить";
-			   this->загрузитьToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::add_btn_Click);
+			   this->загрузитьToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::загрузитьToolStripMenuItem_Click);
 			   // 
 			   // del_btn
 			   // 
-			   this->del_btn->Location = System::Drawing::Point(163, 367);
+			   this->del_btn->Location = System::Drawing::Point(212, 430);
 			   this->del_btn->Name = L"del_btn";
-			   this->del_btn->Size = System::Drawing::Size(75, 23);
+			   this->del_btn->Size = System::Drawing::Size(40, 40);
 			   this->del_btn->TabIndex = 3;
 			   this->del_btn->Text = L"del";
 			   this->del_btn->UseVisualStyleBackColor = true;
@@ -148,9 +144,9 @@ namespace TextingDesktop {
 			   // 
 			   // add_btn
 			   // 
-			   this->add_btn->Location = System::Drawing::Point(163, 300);
+			   this->add_btn->Location = System::Drawing::Point(212, 384);
 			   this->add_btn->Name = L"add_btn";
-			   this->add_btn->Size = System::Drawing::Size(75, 23);
+			   this->add_btn->Size = System::Drawing::Size(40, 40);
 			   this->add_btn->TabIndex = 2;
 			   this->add_btn->Text = L"+";
 			   this->add_btn->UseVisualStyleBackColor = true;
@@ -193,7 +189,6 @@ namespace TextingDesktop {
 	private: OleDbConnection^ toDB() {
 		String^ connection = "provider=Microsoft.JET.OLEDB.4.0;Data Source=data.mdb";
 		OleDbConnection^ dbConnection = gcnew OleDbConnection(connection);
-
 		return dbConnection;
 	}
 
@@ -201,6 +196,55 @@ namespace TextingDesktop {
 	private: void CloseDB(OleDbDataReader^ dbReader, OleDbConnection^ dbConnection) {
 		dbReader->Close();
 		dbConnection->Close();
+	}
+
+	private: void deleteNoteAt(String^ id) {
+		NOTES_COUNT--;
+		OleDbConnection^ dbConnection = toDB();
+		dbConnection->Open();        //открываем соединение
+		String^ query = "DELETE FROM [table] WHERE Код = " + id;  //запрос
+		OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
+		dbCommand->ExecuteNonQuery();
+		dbConnection->Close();
+	}
+
+	private: void insertNote(Note_Item^ note) {
+	////	if (NoteTextBox->Text->Length > 0) {
+	//		String^ id = note->Id();
+	//		int firstLetter = 0;
+	//		while (NoteTextBox->Text[firstLetter] == ' ' || NoteTextBox->Text[firstLetter] == '\n') {
+	//			if (firstLetter < NoteTextBox->Text->Length - 1) {
+	//				firstLetter++;
+	//			}
+	//			else {
+	//				break;
+	//			}
+	////		}
+	//		if (!(firstLetter == NoteTextBox->Text->Length - 1 && (NoteTextBox->Text[firstLetter] == ' ') || NoteTextBox->Text[firstLetter] == '\n')) {
+	//			int firstSpace = firstLetter;
+	//			while (NoteTextBox->Text[firstSpace] != ' ' && NoteTextBox->Text[firstSpace] != '\n') {
+	//				if (firstSpace < NoteTextBox->Text->Length - 1) {
+	//					firstSpace++;
+	//				}
+	//				else {
+	//					break;
+	//				}
+	//			}
+	//			String^ name = NoteTextBox->Text->Substring(firstLetter, firstSpace - firstLetter) + NoteTextBox->Text[firstSpace];
+	//			String^ folder = note->Folder();
+		OleDbConnection^ dbConnection = toDB();
+		dbConnection->Open();        //открываем соединение
+		deleteNoteAt(new_note->getID()->ToString());
+		String^ query = "INSERT INTO [table] (Код, Название, Дата, Содержание) VALUES (" + new_note->getID() + ", '" + new_note->getTitle() + "', '" + new_note->getDate() + "', '" + new_note->getText() + "')";  //запрос
+		MessageBox::Show(query);
+		OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
+		dbCommand->ExecuteNonQuery();
+		dbConnection->Close();
+
+	//			RightList->Items[currentNote]->Selected = true;
+	//		}
+	//	}
+	//
 	}
 
 	private: int Notes_Count(OleDbConnection^ dbConnection) {
@@ -247,13 +291,35 @@ namespace TextingDesktop {
 
 		//	CloseDB(dbReader, dbConnection);
 
-		NoteForm^ note = gcnew NoteForm();
-		note->Show();
+		NoteForm^ note = gcnew NoteForm(new_note);
+		note->ShowDialog();
+
+		MessageBox::Show(new_note->getText());
+		if (new_note->getText() != "") {
+			MessageBox::Show("Почему-то заходит сюда если закрыть создающуюся заметку");
+			//Увеличиваем размер массива заметок
+			OleDbConnection^ dbConnection = toDB();
+			OleDbDataReader^ dbReader = OpenDB(dbConnection);
+
+			array<Note_Item^>^ notes_buf;
+			notes_buf = gcnew array<Note_Item^>(Notes_Count(dbConnection));
+			notes_buf = notes;
+			delete notes;
+			notes = gcnew array<Note_Item^>(Notes_Count(dbConnection) + 1);
+			notes = notes_buf;
+			delete notes_buf;
+
+			CloseDB(dbReader, dbConnection);
+		}
 		//	this->Hide();
 		//	delete note;
 	}
 
 	private: System::Void del_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (listView1->SelectedItems == nullptr) MessageBox::Show("Ты дурак?");
+		MessageBox::Show(listView1->SelectedItems[0]->Index.ToString());
+	//	deleteNoteAt(notes[listView1->SelectedItems[0]->Index]->getID());
+		LoadDB();
 	}
 
 		   //Для изменения ширины столбца
@@ -276,31 +342,19 @@ namespace TextingDesktop {
 		e.NewWidth = listView1.Columns[e.ColumnIndex].Width;*/
 	}
 
-		   //двойное нажатие на выбранную заметку
-	private: System::Void listView1_MouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+	private: void LoadDB() {
+		listView1->Items->Clear();
 
-	}
-
-	private: System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
-		//Проход для подсчета количества заметок
 		OleDbConnection^ dbConnection = toDB();
 		OleDbDataReader^ dbReader = OpenDB(dbConnection);
 		NOTES_COUNT = Notes_Count(dbConnection);
-		NOTES_COUNT++;
-		/*	while (dbReader->Read()) NOTES_COUNT++;
-			CloseDB(dbReader, dbConnection);
-
-			dbConnection = toDB();
-			dbReader = OpenDB(dbConnection);*/
-
-			//	std::vector<Note_Item^>* notes; //массив заметок
 		notes = gcnew array<Note_Item^>(NOTES_COUNT);
-		notes;
 		int i = 0;
 		while (dbReader->Read()) {
 			/* this->listView1->Items->Add(dbReader["Название"]->ToString());
 			 this->listView1->Items->Add(dbReader["Дата"]->ToString());
 			 this->listView1->Items->Add(dbReader["Описание"]->ToString());*/
+			String^ id = dbReader["Код"]->ToString();
 			String^ title = dbReader["Название"]->ToString();
 			String^ date = dbReader["Дата"]->ToString();
 			String^ text = dbReader["Содержание"]->ToString();
@@ -313,22 +367,39 @@ namespace TextingDesktop {
 			listViewItem->ToolTipText = text;
 			listView1->Items->Add(listViewItem);
 
-			Note_Item^ item = gcnew Note_Item(title, date, text);
+			Note_Item^ item = gcnew Note_Item(id,title, date, text);
 			notes[i++] = item;
 		}
 
 		CloseDB(dbReader, dbConnection);
 	}
 
-	private: System::Void listView1_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+	private: System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
+		LoadDB();
+	}
+
+	/*private: System::Void listView1_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+	}*/
+
+	private: System::Void listView1_MouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 		if (listView1->SelectedItems->Count == 1) {
+			String^ id = notes[listView1->SelectedItems[0]->Index]->getID();
 			String^ title = notes[listView1->SelectedItems[0]->Index]->getTitle();
 			String^ date = notes[listView1->SelectedItems[0]->Index]->getDate();
 			String^ text = notes[listView1->SelectedItems[0]->Index]->getText();
 
-			NoteForm^ note = gcnew NoteForm(title, date, text);
-			note->Show();
+		/*	NoteForm^ note = gcnew NoteForm(id,title, date, text, new_note);
+			note->ShowDialog();*/
+			NoteForm^ note = gcnew NoteForm(id,title, date, text, new_note);
+			note->ShowDialog();
+			insertNote(new_note);
+			LoadDB();
+			//
 		}
 	}
-	};
+
+	private: System::Void загрузитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
+		MessageBox::Show(new_note->getText());
+	}
+};
 }
