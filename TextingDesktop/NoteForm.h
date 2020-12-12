@@ -284,18 +284,24 @@ namespace TextingDesktop {
 	//	MessageBox::Show(date);
 		if (date != "") {
 			Date_CheckBox->Checked = true; 
+		//	DatePicker->Value.Today.CompareTo(DatePicker->Value);
 			DatePicker->Value = Convert::ToDateTime(date);
 		}
 	//	else DatePicker->Value = Convert::ToDateTime(date);
 		if (text != "") Text_rtb->Rtf = text;
+
+
 	}
 
 	private: System::Void Save_btn_Click(System::Object^ sender, System::EventArgs^ e) {
-		if (Date_CheckBox->Checked) 
-			new_note->setNoteItems(id, Title_tb->Text, DatePicker->Value.ToShortDateString(), Text_rtb->Rtf);
-		else 
-			new_note->setNoteItems(id, Title_tb->Text, "", Text_rtb->Rtf);
-		this->Close();
+		if (Text_rtb->Text == "") MessageBox::Show("Содержание не может быть пустым");
+		else {
+			if (Date_CheckBox->Checked)
+				new_note->setNoteItems(id, Title_tb->Text, DatePicker->Value.ToShortDateString(), Text_rtb->Rtf);
+			else
+				new_note->setNoteItems(id, Title_tb->Text, "", Text_rtb->Rtf);
+			this->Close();
+		}
 	}
 };
 }
