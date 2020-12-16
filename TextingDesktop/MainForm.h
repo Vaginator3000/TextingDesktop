@@ -21,6 +21,20 @@ namespace TextingDesktop {
 	public ref class MainForm : public System::Windows::Forms::Form
 	{
 	public: array<Note_Item^>^ notes; //массив заметок
+	public: array<Note_Item^>^ search_notes; //массив заметок
+	private: System::Windows::Forms::TextBox^ Search_tb;
+	private: System::Windows::Forms::Button^ search_btn;
+	private: System::Windows::Forms::ListView^ search_lv;
+	private: System::Windows::Forms::ColumnHeader^ columnHeader1;
+	private: System::Windows::Forms::ColumnHeader^ columnHeader2;
+	private: System::Windows::Forms::Button^ ok_btn;
+
+	public:
+
+	public:
+
+	public:
+
 	public: Note_Item^ new_note = gcnew Note_Item(); //новосозданная заметка
 
 	public:
@@ -48,10 +62,12 @@ namespace TextingDesktop {
 	private: System::Windows::Forms::ListViewItem^ listViewItem;
 	protected:
 	private: System::Windows::Forms::MenuStrip^ menuStrip1;
-	private: System::Windows::Forms::ToolStripMenuItem^ файлToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^ справкаToolStripMenuItem;
+
 
 	private: System::Windows::Forms::Button^ del_btn;
-	private: System::Windows::Forms::ToolStripMenuItem^ загрузитьToolStripMenuItem;
+	private: System::Windows::Forms::ToolStripMenuItem^ опрограммеToolStripMenuItem;
+
 	private: System::Windows::Forms::ColumnHeader^ column_name;
 	private: System::Windows::Forms::ColumnHeader^ column_date;
 	private: System::Windows::Forms::Button^ add_btn;
@@ -70,14 +86,21 @@ namespace TextingDesktop {
 		/// </summary>
 		   void InitializeComponent(void)
 		   {
+			   System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			   this->listView1 = (gcnew System::Windows::Forms::ListView());
 			   this->column_name = (gcnew System::Windows::Forms::ColumnHeader());
 			   this->column_date = (gcnew System::Windows::Forms::ColumnHeader());
 			   this->menuStrip1 = (gcnew System::Windows::Forms::MenuStrip());
-			   this->файлToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
-			   this->загрузитьToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			   this->справкаToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
+			   this->опрограммеToolStripMenuItem = (gcnew System::Windows::Forms::ToolStripMenuItem());
 			   this->del_btn = (gcnew System::Windows::Forms::Button());
 			   this->add_btn = (gcnew System::Windows::Forms::Button());
+			   this->Search_tb = (gcnew System::Windows::Forms::TextBox());
+			   this->search_btn = (gcnew System::Windows::Forms::Button());
+			   this->search_lv = (gcnew System::Windows::Forms::ListView());
+			   this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
+			   this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
+			   this->ok_btn = (gcnew System::Windows::Forms::Button());
 			   this->menuStrip1->SuspendLayout();
 			   this->SuspendLayout();
 			   // 
@@ -108,52 +131,110 @@ namespace TextingDesktop {
 			   // 
 			   // menuStrip1
 			   // 
-			   this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->файлToolStripMenuItem });
+			   this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->справкаToolStripMenuItem });
 			   this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			   this->menuStrip1->Name = L"menuStrip1";
 			   this->menuStrip1->Size = System::Drawing::Size(264, 24);
 			   this->menuStrip1->TabIndex = 1;
 			   this->menuStrip1->Text = L"menuStrip1";
 			   // 
-			   // файлToolStripMenuItem
+			   // справкаToolStripMenuItem
 			   // 
-			   this->файлToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->загрузитьToolStripMenuItem });
-			   this->файлToolStripMenuItem->Name = L"файлToolStripMenuItem";
-			   this->файлToolStripMenuItem->Size = System::Drawing::Size(48, 20);
-			   this->файлToolStripMenuItem->Text = L"Файл";
+			   this->справкаToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->опрограммеToolStripMenuItem });
+			   this->справкаToolStripMenuItem->Name = L"справкаToolStripMenuItem";
+			   this->справкаToolStripMenuItem->Size = System::Drawing::Size(65, 20);
+			   this->справкаToolStripMenuItem->Text = L"Справка";
 			   // 
-			   // загрузитьToolStripMenuItem
+			   // опрограммеToolStripMenuItem
 			   // 
-			   this->загрузитьToolStripMenuItem->Name = L"загрузитьToolStripMenuItem";
-			   this->загрузитьToolStripMenuItem->Size = System::Drawing::Size(128, 22);
-			   this->загрузитьToolStripMenuItem->Text = L"Загрузить";
-			   this->загрузитьToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::загрузитьToolStripMenuItem_Click);
+			   this->опрограммеToolStripMenuItem->Name = L"опрограммеToolStripMenuItem";
+			   this->опрограммеToolStripMenuItem->Size = System::Drawing::Size(149, 22);
+			   this->опрограммеToolStripMenuItem->Text = L"О программе";
 			   // 
 			   // del_btn
 			   // 
+			   this->del_btn->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"del_btn.Image")));
 			   this->del_btn->Location = System::Drawing::Point(212, 430);
 			   this->del_btn->Name = L"del_btn";
 			   this->del_btn->Size = System::Drawing::Size(40, 40);
 			   this->del_btn->TabIndex = 3;
-			   this->del_btn->Text = L"del";
 			   this->del_btn->UseVisualStyleBackColor = true;
 			   this->del_btn->Click += gcnew System::EventHandler(this, &MainForm::del_btn_Click);
 			   // 
 			   // add_btn
 			   // 
+			   this->add_btn->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 27.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				   static_cast<System::Byte>(204)));
+			   this->add_btn->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"add_btn.Image")));
 			   this->add_btn->Location = System::Drawing::Point(212, 384);
 			   this->add_btn->Name = L"add_btn";
 			   this->add_btn->Size = System::Drawing::Size(40, 40);
 			   this->add_btn->TabIndex = 2;
-			   this->add_btn->Text = L"+";
 			   this->add_btn->UseVisualStyleBackColor = true;
 			   this->add_btn->Click += gcnew System::EventHandler(this, &MainForm::add_btn_Click);
+			   // 
+			   // Search_tb
+			   // 
+			   this->Search_tb->Location = System::Drawing::Point(136, 2);
+			   this->Search_tb->Name = L"Search_tb";
+			   this->Search_tb->Size = System::Drawing::Size(100, 20);
+			   this->Search_tb->TabIndex = 4;
+			   // 
+			   // search_btn
+			   // 
+			   this->search_btn->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"search_btn.Image")));
+			   this->search_btn->ImageAlign = System::Drawing::ContentAlignment::TopLeft;
+			   this->search_btn->Location = System::Drawing::Point(238, 1);
+			   this->search_btn->Name = L"search_btn";
+			   this->search_btn->Size = System::Drawing::Size(23, 23);
+			   this->search_btn->TabIndex = 5;
+			   this->search_btn->UseVisualStyleBackColor = true;
+			   this->search_btn->Click += gcnew System::EventHandler(this, &MainForm::search_btn_Click);
+			   // 
+			   // search_lv
+			   // 
+			   this->search_lv->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(2) { this->columnHeader1, this->columnHeader2 });
+			   this->search_lv->Dock = System::Windows::Forms::DockStyle::Fill;
+			   this->search_lv->FullRowSelect = true;
+			   this->search_lv->HideSelection = false;
+			   this->search_lv->Location = System::Drawing::Point(0, 24);
+			   this->search_lv->Name = L"search_lv";
+			   this->search_lv->ShowItemToolTips = true;
+			   this->search_lv->Size = System::Drawing::Size(264, 457);
+			   this->search_lv->TabIndex = 6;
+			   this->search_lv->UseCompatibleStateImageBehavior = false;
+			   this->search_lv->View = System::Windows::Forms::View::Details;
+			   this->search_lv->Visible = false;
+			   // 
+			   // columnHeader1
+			   // 
+			   this->columnHeader1->Text = L"Название";
+			   this->columnHeader1->Width = 160;
+			   // 
+			   // columnHeader2
+			   // 
+			   this->columnHeader2->Text = L"Дата";
+			   this->columnHeader2->Width = 100;
+			   // 
+			   // ok_btn
+			   // 
+			   this->ok_btn->Location = System::Drawing::Point(212, 384);
+			   this->ok_btn->Name = L"ok_btn";
+			   this->ok_btn->Size = System::Drawing::Size(40, 40);
+			   this->ok_btn->TabIndex = 7;
+			   this->ok_btn->Text = L"OK";
+			   this->ok_btn->UseVisualStyleBackColor = true;
+			   this->ok_btn->Visible = false;
 			   // 
 			   // MainForm
 			   // 
 			   this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			   this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			   this->ClientSize = System::Drawing::Size(264, 481);
+			   this->Controls->Add(this->ok_btn);
+			   this->Controls->Add(this->search_lv);
+			   this->Controls->Add(this->search_btn);
+			   this->Controls->Add(this->Search_tb);
 			   this->Controls->Add(this->del_btn);
 			   this->Controls->Add(this->add_btn);
 			   this->Controls->Add(this->listView1);
@@ -230,11 +311,14 @@ namespace TextingDesktop {
 	//			String^ folder = note->Folder();
 		OleDbConnection^ dbConnection = toDB();
 		dbConnection->Open();        //открываем соединение
-		deleteNoteAt(new_note->getID()->ToString());
-		String^ query = "INSERT INTO [table] (Код, Название, Дата, Содержание) VALUES (" + new_note->getID() + ", '" + new_note->getTitle() + "', '" + new_note->getDate() + "', '" + new_note->getText()->Replace("'", "''") + "')";  //запрос
-		MessageBox::Show(query);
-		OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
-		dbCommand->ExecuteNonQuery();
+		MessageBox::Show(new_note->getID()->ToString());
+		if (new_note->getID()->ToString() != "" && new_note->getText() != "") {
+			deleteNoteAt(new_note->getID()->ToString());
+			String^ query = "INSERT INTO [table] (Код, Название, Дата, Содержание) VALUES (" + new_note->getID() + ", '" + new_note->getTitle() + "', '" + new_note->getDate() + "', '" + new_note->getText()->Replace("'", "''") + "')";  //запрос
+			MessageBox::Show(query);
+			OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
+			dbCommand->ExecuteNonQuery();
+		}
 		dbConnection->Close();
 
 	//			RightList->Items[currentNote]->Selected = true;
@@ -286,6 +370,7 @@ namespace TextingDesktop {
 		//	}
 
 		//	CloseDB(dbReader, dbConnection);
+		new_note->clear();
 
 		NoteForm^ note = gcnew NoteForm(new_note);
 		note->ShowDialog();
@@ -392,7 +477,8 @@ namespace TextingDesktop {
 			//	else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
 			//}
 			if (date != "") { //Если не пустая дата
-				if (Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) > -1) { //Если дата просрочена
+			//	MessageBox::Show((Convert::ToDateTime(date) - today->Today).ToString());
+				if (Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если дата просрочена
 					if (dbReader["Название"]->ToString()->Equals(""))
 						listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
 					else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
@@ -461,8 +547,110 @@ namespace TextingDesktop {
 		}
 	}
 
-	private: System::Void загрузитьToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
-		MessageBox::Show(new_note->getText());
+	private: System::Void search_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		search_lv->Visible = true;
+		if (Search_tb->Text != "") LoadSearch_lv();
+		if (search_lv->Items->Count == 0) {
+			MessageBox::Show("Ничего не найдено");
+			search_lv->Visible = false;
+		}
+		else {
+			MessageBox::Show(search_lv->Items->Count.ToString());
+			ok_btn->Visible = true;
+		}
+	}
+
+	private: void LoadSearch_lv() {
+		search_lv->Items->Clear();
+
+		OleDbConnection^ dbConnection = toDB();
+		OleDbDataReader^ dbReader = OpenDB(dbConnection);
+		search_notes = gcnew array<Note_Item^>(Notes_Count(dbConnection));
+		int i = 0;
+		while (dbReader->Read()) {
+			/* this->listView1->Items->Add(dbReader["Название"]->ToString());
+			 this->listView1->Items->Add(dbReader["Дата"]->ToString());
+			 this->listView1->Items->Add(dbReader["Описание"]->ToString());*/
+			DateTime^ today = gcnew DateTime();
+			//	today = today->Today;
+
+			String^ id = dbReader["Код"]->ToString();
+			String^ title = dbReader["Название"]->ToString();
+			String^ date = dbReader["Дата"]->ToString();
+			String^ text = dbReader["Содержание"]->ToString();
+
+
+
+				System::Windows::Forms::ListViewItem^ listViewItem1; //Обычный элемент
+				System::Windows::Forms::ListViewItem^ listViewItem2; //Просроченный элемент(дата красным)
+
+				System::Windows::Forms::RichTextBox^ rtBox = gcnew System::Windows::Forms::RichTextBox();
+				rtBox->Rtf = text;
+
+			//	MessageBox::Show(text + "\n" + rtBox->Rtf + "\n" + Search_tb->Text + "\n" + Convert::ToString(text->Contains(Search_tb->Text)));
+			//Если найдено совпадение
+			if (rtBox->Text->Contains(Search_tb->Text)) {
+				//if (dbReader["Название"]->ToString()->Equals(""))
+				//	listViewItem = gcnew Windows::Forms::ListViewItem("<Без названия>");
+				//else listViewItem = gcnew Windows::Forms::ListViewItem(title);
+
+				//listViewItem->SubItems->Add(date);
+				//listViewItem->ToolTipText = rtBox->Text; //При наведении выводится содержание
+				//listView1->Items->Add(listViewItem1);
+
+				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если  дата просрочена 
+				//	if (dbReader["Название"]->ToString()->Equals(""))
+				//		listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
+				//	else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
+				//}
+				if (date != "") { //Если не пустая дата
+				//	MessageBox::Show((Convert::ToDateTime(date) - today->Today).ToString());
+					if (Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если дата просрочена
+						if (dbReader["Название"]->ToString()->Equals(""))
+							listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
+						else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
+						listViewItem2->ForeColor = Color::Red;
+
+						listViewItem2->SubItems->Add(date);
+						listViewItem2->ToolTipText = rtBox->Text; //При наведении выводится содержание
+						search_lv->Items->Add(listViewItem2);
+					}
+					else { //Если время еще есть
+						if (dbReader["Название"]->ToString()->Equals(""))
+							listViewItem1 = gcnew Windows::Forms::ListViewItem("<Без названия>");
+						else listViewItem1 = gcnew Windows::Forms::ListViewItem(title);
+
+						listViewItem1->SubItems->Add(date);
+						listViewItem1->ToolTipText = rtBox->Text; //При наведении выводится содержание
+						search_lv->Items->Add(listViewItem1);
+					}
+				}
+				else {
+					if (dbReader["Название"]->ToString()->Equals(""))
+						listViewItem1 = gcnew Windows::Forms::ListViewItem("<Без названия>");
+					else listViewItem1 = gcnew Windows::Forms::ListViewItem(title);
+
+					listViewItem1->SubItems->Add(date);
+					listViewItem1->ToolTipText = rtBox->Text; //При наведении выводится содержание
+					search_lv->Items->Add(listViewItem1);
+				}
+
+				Note_Item^ item = gcnew Note_Item(id, title, date, text);
+				search_notes[i++] = item;
+
+				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) {
+				//	MessageBox::Show("Уже поздно");
+				//	listViewItem->SubItems.
+				////	MessageBox::Show(date);
+				////	MessageBox::Show(Convert::ToDateTime(date).ToString());
+				////	MessageBox::Show(today->Today.ToString() +"\n" + (Convert::ToDateTime(date)).ToString() + "\n\n" + today->Today.CompareTo(Convert::ToDateTime(date)).ToString());
+				//}
+				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == -1)
+				//	MessageBox::Show("Eще есть время");
+			}
+		}
+
+		CloseDB(dbReader, dbConnection);
 	}
 };
 }

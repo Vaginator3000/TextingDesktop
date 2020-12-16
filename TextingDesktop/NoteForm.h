@@ -177,9 +177,9 @@ namespace TextingDesktop {
 			// 
 			// Save_btn
 			// 
-			this->Save_btn->Location = System::Drawing::Point(177, 453);
+			this->Save_btn->Location = System::Drawing::Point(179, 453);
 			this->Save_btn->Name = L"Save_btn";
-			this->Save_btn->Size = System::Drawing::Size(75, 23);
+			this->Save_btn->Size = System::Drawing::Size(73, 23);
 			this->Save_btn->TabIndex = 9;
 			this->Save_btn->Text = L"Сохранить";
 			this->Save_btn->UseVisualStyleBackColor = true;
