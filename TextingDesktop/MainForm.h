@@ -24,10 +24,14 @@ namespace TextingDesktop {
 	public: array<Note_Item^>^ search_notes; //массив заметок
 	private: System::Windows::Forms::TextBox^ Search_tb;
 	private: System::Windows::Forms::Button^ search_btn;
+
+
+
+	private: System::Windows::Forms::Button^ ok_btn;
 	private: System::Windows::Forms::ListView^ search_lv;
 	private: System::Windows::Forms::ColumnHeader^ columnHeader1;
 	private: System::Windows::Forms::ColumnHeader^ columnHeader2;
-	private: System::Windows::Forms::Button^ ok_btn;
+
 
 	public:
 
@@ -97,10 +101,10 @@ namespace TextingDesktop {
 			   this->add_btn = (gcnew System::Windows::Forms::Button());
 			   this->Search_tb = (gcnew System::Windows::Forms::TextBox());
 			   this->search_btn = (gcnew System::Windows::Forms::Button());
+			   this->ok_btn = (gcnew System::Windows::Forms::Button());
 			   this->search_lv = (gcnew System::Windows::Forms::ListView());
 			   this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
 			   this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
-			   this->ok_btn = (gcnew System::Windows::Forms::Button());
 			   this->menuStrip1->SuspendLayout();
 			   this->SuspendLayout();
 			   // 
@@ -191,6 +195,16 @@ namespace TextingDesktop {
 			   this->search_btn->UseVisualStyleBackColor = true;
 			   this->search_btn->Click += gcnew System::EventHandler(this, &MainForm::search_btn_Click);
 			   // 
+			   // ok_btn
+			   // 
+			   this->ok_btn->Location = System::Drawing::Point(212, 384);
+			   this->ok_btn->Name = L"ok_btn";
+			   this->ok_btn->Size = System::Drawing::Size(40, 40);
+			   this->ok_btn->TabIndex = 8;
+			   this->ok_btn->Text = L"ОК";
+			   this->ok_btn->UseVisualStyleBackColor = true;
+			   this->ok_btn->Visible = false;
+			   // 
 			   // search_lv
 			   // 
 			   this->search_lv->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(2) { this->columnHeader1, this->columnHeader2 });
@@ -201,7 +215,7 @@ namespace TextingDesktop {
 			   this->search_lv->Name = L"search_lv";
 			   this->search_lv->ShowItemToolTips = true;
 			   this->search_lv->Size = System::Drawing::Size(264, 457);
-			   this->search_lv->TabIndex = 6;
+			   this->search_lv->TabIndex = 9;
 			   this->search_lv->UseCompatibleStateImageBehavior = false;
 			   this->search_lv->View = System::Windows::Forms::View::Details;
 			   this->search_lv->Visible = false;
@@ -215,16 +229,6 @@ namespace TextingDesktop {
 			   // 
 			   this->columnHeader2->Text = L"Дата";
 			   this->columnHeader2->Width = 100;
-			   // 
-			   // ok_btn
-			   // 
-			   this->ok_btn->Location = System::Drawing::Point(212, 384);
-			   this->ok_btn->Name = L"ok_btn";
-			   this->ok_btn->Size = System::Drawing::Size(40, 40);
-			   this->ok_btn->TabIndex = 7;
-			   this->ok_btn->Text = L"OK";
-			   this->ok_btn->UseVisualStyleBackColor = true;
-			   this->ok_btn->Visible = false;
 			   // 
 			   // MainForm
 			   // 
@@ -557,6 +561,7 @@ namespace TextingDesktop {
 		else {
 			MessageBox::Show(search_lv->Items->Count.ToString());
 			ok_btn->Visible = true;
+			ok_btn->BringToFront();
 		}
 	}
 
