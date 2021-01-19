@@ -235,7 +235,7 @@ namespace TextingDesktop {
 			this->MaximumSize = System::Drawing::Size(280, 520);
 			this->Name = L"NoteForm";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterParent;
-			this->Text = L"NoteForm";
+			this->Text = L"Заметка";
 			this->Load += gcnew System::EventHandler(this, &NoteForm::NoteForm_Load);
 			this->ResumeLayout(false);
 			this->PerformLayout();
@@ -281,13 +281,10 @@ namespace TextingDesktop {
 
 	private: System::Void NoteForm_Load(System::Object^ sender, System::EventArgs^ e) {
 		if (title != "") Title_tb->Text = title;
-	//	MessageBox::Show(date);
 		if (date != "") {
 			Date_CheckBox->Checked = true; 
-		//	DatePicker->Value.Today.CompareTo(DatePicker->Value);
 			DatePicker->Value = Convert::ToDateTime(date);
 		}
-	//	else DatePicker->Value = Convert::ToDateTime(date);
 		if (text != "") Text_rtb->Rtf = text;
 
 
@@ -296,11 +293,16 @@ namespace TextingDesktop {
 	private: System::Void Save_btn_Click(System::Object^ sender, System::EventArgs^ e) {
 		if (Text_rtb->Text == "") MessageBox::Show("Содержание не может быть пустым");
 		else {
-			if (Date_CheckBox->Checked)
-				new_note->setNoteItems(id, Title_tb->Text, DatePicker->Value.ToShortDateString(), Text_rtb->Rtf);
-			else
-				new_note->setNoteItems(id, Title_tb->Text, "", Text_rtb->Rtf);
-			this->Close();
+			try {
+				if (Date_CheckBox->Checked)
+					new_note->setNoteItems(id, Title_tb->Text, DatePicker->Value.ToShortDateString(), Text_rtb->Rtf);
+				else
+					new_note->setNoteItems(id, Title_tb->Text, "", Text_rtb->Rtf);
+				this->Close();
+			}
+			catch (...) {
+				MessageBox::Show("Непредвиденная ошибка!\nВозможно, запрос слишком сложный");
+			}
 		}
 	}
 };

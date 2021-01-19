@@ -1,6 +1,7 @@
 #pragma once
 #include "Note_Item.cpp"
 #include "NoteForm.h"
+#include "About.h"
 
 	using namespace System;
 using namespace System::Windows::Forms;
@@ -31,6 +32,7 @@ namespace TextingDesktop {
 	private: System::Windows::Forms::ListView^ search_lv;
 	private: System::Windows::Forms::ColumnHeader^ columnHeader1;
 	private: System::Windows::Forms::ColumnHeader^ columnHeader2;
+	private: System::Windows::Forms::NotifyIcon^ notifyIcon1;
 
 
 	public:
@@ -90,6 +92,7 @@ namespace TextingDesktop {
 		/// </summary>
 		   void InitializeComponent(void)
 		   {
+			   this->components = (gcnew System::ComponentModel::Container());
 			   System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MainForm::typeid));
 			   this->listView1 = (gcnew System::Windows::Forms::ListView());
 			   this->column_name = (gcnew System::Windows::Forms::ColumnHeader());
@@ -105,6 +108,7 @@ namespace TextingDesktop {
 			   this->search_lv = (gcnew System::Windows::Forms::ListView());
 			   this->columnHeader1 = (gcnew System::Windows::Forms::ColumnHeader());
 			   this->columnHeader2 = (gcnew System::Windows::Forms::ColumnHeader());
+			   this->notifyIcon1 = (gcnew System::Windows::Forms::NotifyIcon(this->components));
 			   this->menuStrip1->SuspendLayout();
 			   this->SuspendLayout();
 			   // 
@@ -154,6 +158,7 @@ namespace TextingDesktop {
 			   this->опрограммеToolStripMenuItem->Name = L"опрограммеToolStripMenuItem";
 			   this->опрограммеToolStripMenuItem->Size = System::Drawing::Size(149, 22);
 			   this->опрограммеToolStripMenuItem->Text = L"О программе";
+			   this->опрограммеToolStripMenuItem->Click += gcnew System::EventHandler(this, &MainForm::опрограммеToolStripMenuItem_Click);
 			   // 
 			   // del_btn
 			   // 
@@ -204,6 +209,7 @@ namespace TextingDesktop {
 			   this->ok_btn->Text = L"ОК";
 			   this->ok_btn->UseVisualStyleBackColor = true;
 			   this->ok_btn->Visible = false;
+			   this->ok_btn->Click += gcnew System::EventHandler(this, &MainForm::ok_btn_Click);
 			   // 
 			   // search_lv
 			   // 
@@ -219,6 +225,7 @@ namespace TextingDesktop {
 			   this->search_lv->UseCompatibleStateImageBehavior = false;
 			   this->search_lv->View = System::Windows::Forms::View::Details;
 			   this->search_lv->Visible = false;
+			   this->search_lv->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::search_lv_MouseDoubleClick);
 			   // 
 			   // columnHeader1
 			   // 
@@ -229,6 +236,12 @@ namespace TextingDesktop {
 			   // 
 			   this->columnHeader2->Text = L"Дата";
 			   this->columnHeader2->Width = 100;
+			   // 
+			   // notifyIcon1
+			   // 
+			   this->notifyIcon1->BalloonTipIcon = System::Windows::Forms::ToolTipIcon::Info;
+			   this->notifyIcon1->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"notifyIcon1.Icon")));
+			   this->notifyIcon1->Text = L"notifyIcon1";
 			   // 
 			   // MainForm
 			   // 
@@ -248,7 +261,7 @@ namespace TextingDesktop {
 			   this->MaximumSize = System::Drawing::Size(280, 520);
 			   this->MinimumSize = System::Drawing::Size(280, 520);
 			   this->Name = L"MainForm";
-			   this->Text = L"MainForm";
+			   this->Text = L"Менеджер задач";
 			   this->Load += gcnew System::EventHandler(this, &MainForm::MainForm_Load);
 			   this->menuStrip1->ResumeLayout(false);
 			   this->menuStrip1->PerformLayout();
@@ -259,7 +272,13 @@ namespace TextingDesktop {
 #pragma endregion
 		   /*Для открытия базы данных*/
 	private: OleDbDataReader^ OpenDB(OleDbConnection^ dbConnection) {
-		dbConnection->Open();        //открываем соединение
+		try {
+			dbConnection->Open();        //открываем соединение
+		}
+		catch (...) {
+				MessageBox::Show("Проверьте наличие файла data.mdb", "Ошибка!", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				this->Close();
+		}
 		String^ query = "SELECT * FROM [table]";  //запрос
 		OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
 		OleDbDataReader^ dbReader = dbCommand->ExecuteReader(); //считываем данные
@@ -290,45 +309,15 @@ namespace TextingDesktop {
 	}
 
 	private: void insertNote(Note_Item^ note) {
-	////	if (NoteTextBox->Text->Length > 0) {
-	//		String^ id = note->Id();
-	//		int firstLetter = 0;
-	//		while (NoteTextBox->Text[firstLetter] == ' ' || NoteTextBox->Text[firstLetter] == '\n') {
-	//			if (firstLetter < NoteTextBox->Text->Length - 1) {
-	//				firstLetter++;
-	//			}
-	//			else {
-	//				break;
-	//			}
-	////		}
-	//		if (!(firstLetter == NoteTextBox->Text->Length - 1 && (NoteTextBox->Text[firstLetter] == ' ') || NoteTextBox->Text[firstLetter] == '\n')) {
-	//			int firstSpace = firstLetter;
-	//			while (NoteTextBox->Text[firstSpace] != ' ' && NoteTextBox->Text[firstSpace] != '\n') {
-	//				if (firstSpace < NoteTextBox->Text->Length - 1) {
-	//					firstSpace++;
-	//				}
-	//				else {
-	//					break;
-	//				}
-	//			}
-	//			String^ name = NoteTextBox->Text->Substring(firstLetter, firstSpace - firstLetter) + NoteTextBox->Text[firstSpace];
-	//			String^ folder = note->Folder();
 		OleDbConnection^ dbConnection = toDB();
 		dbConnection->Open();        //открываем соединение
-		MessageBox::Show(new_note->getID()->ToString());
 		if (new_note->getID()->ToString() != "" && new_note->getText() != "") {
 			deleteNoteAt(new_note->getID()->ToString());
 			String^ query = "INSERT INTO [table] (Код, Название, Дата, Содержание) VALUES (" + new_note->getID() + ", '" + new_note->getTitle() + "', '" + new_note->getDate() + "', '" + new_note->getText()->Replace("'", "''") + "')";  //запрос
-			MessageBox::Show(query);
 			OleDbCommand^ dbCommand = gcnew OleDbCommand(query, dbConnection); //команда
 			dbCommand->ExecuteNonQuery();
 		}
 		dbConnection->Close();
-
-	//			RightList->Items[currentNote]->Selected = true;
-	//		}
-	//	}
-	//
 	}
 
 	private: int Notes_Count(OleDbConnection^ dbConnection) {
@@ -339,47 +328,11 @@ namespace TextingDesktop {
 
 	private: System::Void add_btn_Click(System::Object^ sender, System::EventArgs^ e)
 	{
-		//	//Проход для подсчета количества заметок
-		//	OleDbConnection^ dbConnection = toDB();
-		//	OleDbDataReader^ dbReader = OpenDB(dbConnection);
-		//	NOTES_COUNT = Notes_Count(dbConnection);
-		//	NOTES_COUNT++;
-		///*	while (dbReader->Read()) NOTES_COUNT++;
-		//	CloseDB(dbReader, dbConnection);
-
-		//	dbConnection = toDB();
-		//	dbReader = OpenDB(dbConnection);*/
-
-		////	std::vector<Note_Item^>* notes; //массив заметок
-		//	notes = gcnew array<Note_Item^>(NOTES_COUNT);
-		//	int i = 0;
-		//	while (dbReader->Read()) {
-		//		/* this->listView1->Items->Add(dbReader["Название"]->ToString());
-		//		 this->listView1->Items->Add(dbReader["Дата"]->ToString());
-		//		 this->listView1->Items->Add(dbReader["Описание"]->ToString());*/
-		//		String^ title = dbReader["Название"]->ToString();
-		//		String^ date = dbReader["Дата"]->ToString();
-		//		String^ text = dbReader["Содержание"]->ToString();
-
-		//		if (dbReader["Название"]->ToString()->Equals("")) 
-		//			listViewItem = gcnew Windows::Forms::ListViewItem("<Без названия>");
-		//		else listViewItem = gcnew Windows::Forms::ListViewItem(title);
-
-		//		listViewItem->SubItems->Add(date);
-		//		listViewItem->ToolTipText = text;
-		//		listView1->Items->Add(listViewItem);
-
-		//		Note_Item^ item = gcnew Note_Item(title, date, text);
-		//		notes[i++] = item;
-		//	}
-
-		//	CloseDB(dbReader, dbConnection);
 		new_note->clear();
 
 		NoteForm^ note = gcnew NoteForm(new_note);
 		note->ShowDialog();
 
-		MessageBox::Show(new_note->getText());
 		if (new_note->getText() != "") {
 			//Увеличиваем размер массива заметок
 			OleDbConnection^ dbConnection = toDB();
@@ -401,16 +354,6 @@ namespace TextingDesktop {
 
 			LoadDB();
 		}
-
-		//OleDbConnection^ dbConnection1 = gcnew OleDbConnection(connection);
-		//dbConnection1->Open();        //открываем соединение
-
-		//String^ query1 = "INSERT INTO tablename (Код, Название, Категория, Цель, Требуемыекомпоненты, Автор, Датавыполнения, Статусвыполнения) VALUES (" + id + " , '" + name + "', '" + category + "', '" + target + "', '" + tools + "', '" + author + "', '" + date + "', '" + status + "')";  //запрос
-		//OleDbCommand^ dbCommand1 = gcnew OleDbCommand(query1, dbConnection1); //команда
-		//dbCommand1->ExecuteNonQuery();
-		//dbConnection1->Close()
-		//	this->Hide();
-		//	delete note;
 	}
 
 	private: System::Void del_btn_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -419,27 +362,6 @@ namespace TextingDesktop {
 			LoadDB();
 		}
 	}
-
-		   //Для изменения ширины столбца
-	//private: System::Void listView1_ItemMouseHover(System::Object^ sender, System::Windows::Forms::ListViewItemMouseHoverEventArgs^ e) {
-	//	//OleDbConnection^ dbConnection = toDB();
-	//	//OleDbDataReader^ dbReader = OpenDB(dbConnection);
-
-	//	//ToolTip^ tooltip = gcnew ToolTip();
-	//	//String^ str;
-	//	//while (dbReader->Read()) {
-	//	//	str = listView1->SelectedItems->ToString();
-	//	//	//t.SetToolTip(TextBox1, "Подсказка для TextBox");
-	//	//}
-	//	//tooltip->SetToolTip(listView1->SelectedItems[0], /*dbReader["Содержание"]->ToString()*/ "жопа");
-
-	//	//CloseDB(dbReader, dbConnection);
-	//}
-	//private: System::Void listView1_ColumnWidthChanged(System::Object^ sender, System::Windows::Forms::ColumnWidthChangedEventArgs^ e) {
-	//	/*e-> = true;
-	//	e.NewWidth = listView1.Columns[e.ColumnIndex].Width;*/
-	//}
-
 		   
 	private: void LoadDB() {
 		listView1->Items->Clear();
@@ -449,17 +371,23 @@ namespace TextingDesktop {
 		notes = gcnew array<Note_Item^>(Notes_Count(dbConnection));
 		int i = 0;
 		while (dbReader->Read()) {
-			/* this->listView1->Items->Add(dbReader["Название"]->ToString());
-			 this->listView1->Items->Add(dbReader["Дата"]->ToString());
-			 this->listView1->Items->Add(dbReader["Описание"]->ToString());*/
 			DateTime^ today = gcnew DateTime();
-		//	today = today->Today;
 
-			String^ id = dbReader["Код"]->ToString();
-			String^ title = dbReader["Название"]->ToString();
-			String^ date = dbReader["Дата"]->ToString();
-			String^ text = dbReader["Содержание"]->ToString();
+			String^ id;
+			String^ title;
+			String^ date;
+			String^ text;
 
+			try {
+				id = dbReader["Код"]->ToString();
+				title = dbReader["Название"]->ToString();
+				date = dbReader["Дата"]->ToString();
+				text = dbReader["Содержание"]->ToString();
+			}
+			catch (...) {
+				MessageBox::Show("Проверьте правильность файла data.mdb", "Ошибка!", MessageBoxButtons::OK, MessageBoxIcon::Error);
+				this->Close();
+			}
 
 			System::Windows::Forms::ListViewItem^ listViewItem1; //Обычный элемент
 			System::Windows::Forms::ListViewItem^ listViewItem2; //Просроченный элемент(дата красным)
@@ -467,21 +395,7 @@ namespace TextingDesktop {
 			System::Windows::Forms::RichTextBox^ rtBox = gcnew System::Windows::Forms::RichTextBox();
 			rtBox->Rtf = text;
 
-			//if (dbReader["Название"]->ToString()->Equals(""))
-			//	listViewItem = gcnew Windows::Forms::ListViewItem("<Без названия>");
-			//else listViewItem = gcnew Windows::Forms::ListViewItem(title);
-
-			//listViewItem->SubItems->Add(date);
-			//listViewItem->ToolTipText = rtBox->Text; //При наведении выводится содержание
-			//listView1->Items->Add(listViewItem1);
-
-			//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если  дата просрочена 
-			//	if (dbReader["Название"]->ToString()->Equals(""))
-			//		listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
-			//	else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
-			//}
 			if (date != "") { //Если не пустая дата
-			//	MessageBox::Show((Convert::ToDateTime(date) - today->Today).ToString());
 				if (Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если дата просрочена
 					if (dbReader["Название"]->ToString()->Equals(""))
 						listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
@@ -500,6 +414,23 @@ namespace TextingDesktop {
 					listViewItem1->SubItems->Add(date);
 					listViewItem1->ToolTipText = rtBox->Text; //При наведении выводится содержание
 					listView1->Items->Add(listViewItem1);
+
+					//Создание уведомления
+					String^ datesDif = (Convert::ToDateTime(date) - today->Today).ToString(); //Для создания уведомления нужно кол-во оставшихся дней до даты выполнения
+					int countDays = 0;
+					if (datesDif != "00:00:00")
+						countDays = Convert::ToInt32(datesDif->Remove(datesDif->IndexOf(".")));
+
+					if (countDays == 3 || countDays == 0) {
+						if (countDays) notifyIcon1->BalloonTipTitle = title + " - oсталось 3 дня \n";
+						else notifyIcon1->BalloonTipTitle = title + " - сегодня \n";
+						notifyIcon1->BalloonTipText = rtBox->Text;
+						notifyIcon1->Visible =  true;
+						notifyIcon1->ShowBalloonTip(1000);
+						
+					}
+
+
 				}
 			}
 			else {
@@ -514,16 +445,6 @@ namespace TextingDesktop {
 
 			Note_Item^ item = gcnew Note_Item(id,title, date, text);
 			notes[i++] = item;
-
-			//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) {
-			//	MessageBox::Show("Уже поздно");
-			//	listViewItem->SubItems.
-			////	MessageBox::Show(date);
-			////	MessageBox::Show(Convert::ToDateTime(date).ToString());
-			////	MessageBox::Show(today->Today.ToString() +"\n" + (Convert::ToDateTime(date)).ToString() + "\n\n" + today->Today.CompareTo(Convert::ToDateTime(date)).ToString());
-			//}
-			//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == -1)
-			//	MessageBox::Show("Eще есть время");
 		}
 
 		CloseDB(dbReader, dbConnection);
@@ -533,22 +454,23 @@ namespace TextingDesktop {
 		LoadDB();
 	}
 
-	/*private: System::Void listView1_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-	}*/
+	private: void listView_MouseDoubleClick(System::Windows::Forms::ListView^ lv, array<Note_Item^>^ arr) {
+		if (lv->SelectedItems->Count == 1) {
+			String^ id = arr[lv->SelectedItems[0]->Index]->getID();
+			String^ title = arr[lv->SelectedItems[0]->Index]->getTitle();
+			String^ date = arr[lv->SelectedItems[0]->Index]->getDate();
+			String^ text = arr[lv->SelectedItems[0]->Index]->getText();
 
-	private: System::Void listView1_MouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		if (listView1->SelectedItems->Count == 1) {
-			String^ id = notes[listView1->SelectedItems[0]->Index]->getID();
-			String^ title = notes[listView1->SelectedItems[0]->Index]->getTitle();
-			String^ date = notes[listView1->SelectedItems[0]->Index]->getDate();
-			String^ text = notes[listView1->SelectedItems[0]->Index]->getText();
-
-			NoteForm^ note = gcnew NoteForm(id,title, date, text, new_note);
+			NoteForm^ note = gcnew NoteForm(id, title, date, text, new_note);
 			note->ShowDialog();
 			insertNote(new_note);
 			LoadDB();
 			//
 		}
+	}
+
+	private: System::Void listView1_MouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		listView_MouseDoubleClick(listView1, notes);
 	}
 
 	private: System::Void search_btn_Click(System::Object^ sender, System::EventArgs^ e) {
@@ -559,7 +481,7 @@ namespace TextingDesktop {
 			search_lv->Visible = false;
 		}
 		else {
-			MessageBox::Show(search_lv->Items->Count.ToString());
+			MessageBox::Show("Найдено заметок: " + search_lv->Items->Count.ToString());
 			ok_btn->Visible = true;
 			ok_btn->BringToFront();
 		}
@@ -568,16 +490,13 @@ namespace TextingDesktop {
 	private: void LoadSearch_lv() {
 		search_lv->Items->Clear();
 
+
 		OleDbConnection^ dbConnection = toDB();
 		OleDbDataReader^ dbReader = OpenDB(dbConnection);
 		search_notes = gcnew array<Note_Item^>(Notes_Count(dbConnection));
 		int i = 0;
 		while (dbReader->Read()) {
-			/* this->listView1->Items->Add(dbReader["Название"]->ToString());
-			 this->listView1->Items->Add(dbReader["Дата"]->ToString());
-			 this->listView1->Items->Add(dbReader["Описание"]->ToString());*/
 			DateTime^ today = gcnew DateTime();
-			//	today = today->Today;
 
 			String^ id = dbReader["Код"]->ToString();
 			String^ title = dbReader["Название"]->ToString();
@@ -592,24 +511,9 @@ namespace TextingDesktop {
 				System::Windows::Forms::RichTextBox^ rtBox = gcnew System::Windows::Forms::RichTextBox();
 				rtBox->Rtf = text;
 
-			//	MessageBox::Show(text + "\n" + rtBox->Rtf + "\n" + Search_tb->Text + "\n" + Convert::ToString(text->Contains(Search_tb->Text)));
 			//Если найдено совпадение
-			if (rtBox->Text->Contains(Search_tb->Text)) {
-				//if (dbReader["Название"]->ToString()->Equals(""))
-				//	listViewItem = gcnew Windows::Forms::ListViewItem("<Без названия>");
-				//else listViewItem = gcnew Windows::Forms::ListViewItem(title);
-
-				//listViewItem->SubItems->Add(date);
-				//listViewItem->ToolTipText = rtBox->Text; //При наведении выводится содержание
-				//listView1->Items->Add(listViewItem1);
-
-				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если  дата просрочена 
-				//	if (dbReader["Название"]->ToString()->Equals(""))
-				//		listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
-				//	else listViewItem2 = gcnew Windows::Forms::ListViewItem(title);
-				//}
+			if (rtBox->Text->Contains(Search_tb->Text) || title->Contains(Search_tb->Text) || date->Contains(Search_tb->Text)) {
 				if (date != "") { //Если не пустая дата
-				//	MessageBox::Show((Convert::ToDateTime(date) - today->Today).ToString());
 					if (Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) { //Если дата просрочена
 						if (dbReader["Название"]->ToString()->Equals(""))
 							listViewItem2 = gcnew Windows::Forms::ListViewItem("<Без названия>");
@@ -642,20 +546,28 @@ namespace TextingDesktop {
 
 				Note_Item^ item = gcnew Note_Item(id, title, date, text);
 				search_notes[i++] = item;
-
-				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == 1) {
-				//	MessageBox::Show("Уже поздно");
-				//	listViewItem->SubItems.
-				////	MessageBox::Show(date);
-				////	MessageBox::Show(Convert::ToDateTime(date).ToString());
-				////	MessageBox::Show(today->Today.ToString() +"\n" + (Convert::ToDateTime(date)).ToString() + "\n\n" + today->Today.CompareTo(Convert::ToDateTime(date)).ToString());
-				//}
-				//if (date != "" && Convert::ToInt32(today->Today.CompareTo(Convert::ToDateTime(date))) == -1)
-				//	MessageBox::Show("Eще есть время");
 			}
 		}
 
 		CloseDB(dbReader, dbConnection);
+	}
+
+	private: System::Void search_lv_MouseDoubleClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		listView_MouseDoubleClick(search_lv, search_notes);
+		LoadSearch_lv();
+	}
+
+	private: System::Void ok_btn_Click(System::Object^ sender, System::EventArgs^ e) {
+		search_lv->Items->Clear();
+		search_lv->Visible = false;
+		ok_btn->Visible = false;
+		Search_tb->Text = "";
+
+	}
+
+	private: System::Void опрограммеToolStripMenuItem_Click(System::Object^ sender, System::EventArgs^ e) {
+		About^ ab = gcnew About();
+		ab->ShowDialog();
 	}
 };
 }
